@@ -193,7 +193,11 @@ To reproduce accuracy results, run the evaluation tool on the COCO validation se
 ./cpp/run_coco_inference data/coco/val2017 models/yolo26n.hef detections.json
 ```
 
-3.  Use a Python script (e.g., `pycocotools`) to calculate mAP from `detections.json`.
+3.  Calculate mAP using the provided Python script:
+
+```bash
+python python/evaluate_detections.py --detections detections.json --coco_ann data/coco/annotations/instances_val2017.json
+```
 
 ---
 
