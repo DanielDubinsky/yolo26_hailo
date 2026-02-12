@@ -141,7 +141,43 @@ python -m export.cli \
 
 ---
 
-## 3. Python Inference
+## 3. ONNX Verification Tools
+
+The repository includes tools to run the original ONNX models on CPU for verification and debugging. These are located in `cpp/onnx/` and `python/onnx/`.
+
+### Python ONNX Inference
+
+```bash
+# Single Image Detection
+python python/onnx/detect_image.py input.jpg --model models/yolo26n.onnx
+
+# Benchmark
+python python/onnx/benchmark.py models/yolo26n.onnx --iterations 100
+```
+
+### C++ ONNX Inference
+
+To build the ONNX C++ tools:
+
+```bash
+cd cpp/onnx
+make
+cd ../..
+```
+
+Then run:
+
+```bash
+# Detect Image
+./cpp/onnx/detect_image input.jpg models/yolo26n.onnx
+
+# Benchmark
+./cpp/onnx/benchmark models/yolo26n.onnx 100
+```
+
+---
+
+## 4. Python Inference (Hailo)
 
 Run inference using the generated HEF file and Python post-processing.
 
@@ -167,7 +203,7 @@ python python/benchmark_inference.py --hef models/yolo26n.hef --iterations 1000
 
 ---
 
-## 4. C++ Inference & Evaluation
+## 5. C++ Inference & Evaluation
 
 The C++ implementation provides high-performance inference.
 
