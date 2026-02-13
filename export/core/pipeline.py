@@ -3,7 +3,7 @@ import datetime
 from pathlib import Path
 from typing import List, Optional
 from ..config import ExportConfig, get_variant_config
-from .logger import setup_logger
+from .logger import setup_logger, redirect_output_to_log, restore_output
 from ..steps.base import Step
 from ..steps.extract import ExtractSubgraphsStep
 from ..steps.convert import OnnxToHarStep
@@ -50,19 +50,22 @@ class ExportPipeline:
         log_file = run_dir / "run.log"
         setup_logger("export", log_file) 
         
-        self.logger.info(f"Starting export run for {self.config.variant} on {self.config.target}")
-        self.logger.info(f"Run directory: {run_dir}")
-        self.logger.info(f"Input ONNX: {self.config.onnx_path}")
+        # 3. Redirect stdout and stderr to log file
+        redirectors = redirect_output_to_log(log_file)
         
-        # 3. Context Initialization
-        context = {
-            'config': self.config,
-            'variant_config': get_variant_config(self.config.variant),
-            'run_dir': run_dir
-        }
-        
-        # 4. Execute Steps
         try:
+            self.logger.info(f"Starting export run for {self.config.variant} on {self.config.target}")
+            self.logger.info(f"Run directory: {run_dir}")
+            self.logger.info(f"Input ONNX: {self.config.onnx_path}")
+            
+            # 4. Context Initialization
+            context = {
+                'config': self.config,
+                'variant_config': get_variant_config(self.config.variant),
+                'run_dir': run_dir
+            }
+            
+            # 5. Execute Steps
             for step in self.steps:
                 context = step.run(context)
                 
@@ -72,4 +75,7 @@ class ExportPipeline:
         except Exception as e:
             self.logger.error(f"Export failed: {e}", exc_info=True)
             raise
+        finally:
+            # Restore original stdout/stderr
+            restore_output(*redirectors)
 
