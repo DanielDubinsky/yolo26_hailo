@@ -72,8 +72,40 @@ class QuantizeStep(Step):
         def load_and_preprocess_image(path):
             image = tf.io.read_file(path)
             image = tf.image.decode_jpeg(image, channels=3)
-            image = tf.image.resize(image, [640, 640])
-            return tf.cast(image, tf.float32), {}
+            
+            # Helper to perform letterbox using TF ops
+            shape = tf.shape(image)
+            h = tf.cast(shape[0], tf.float32)
+            w = tf.cast(shape[1], tf.float32)
+            target_size = 640
+            target_size_f = tf.cast(target_size, tf.float32)
+
+            scale = tf.minimum(target_size_f / h, target_size_f / w)
+            new_w = tf.cast(w * scale, tf.int32)
+            new_h = tf.cast(h * scale, tf.int32)
+
+            # Resize (bilinear matches OpenCV default)
+            image_resized = tf.image.resize(image, [new_h, new_w], method=tf.image.ResizeMethod.BILINEAR)
+            
+            # Padding
+            pad_w = (target_size - new_w) // 2
+            pad_h = (target_size - new_h) // 2
+            
+            pad_h_bottom = target_size - new_h - pad_h
+            pad_w_right = target_size - new_w - pad_w
+            
+            paddings = [[pad_h, pad_h_bottom], [pad_w, pad_w_right], [0, 0]]
+            
+            # Pad with 114 (gray) to match common.py
+            image_padded = tf.pad(image_resized, paddings, constant_values=114.0)
+            
+            # Ensure range and type (float32 for subsequent processing)
+            image_padded = tf.clip_by_value(image_padded, 0.0, 255.0)
+            
+            # Set static shape to avoid Hailo SDK errors with None dimensions
+            image_padded.set_shape([640, 640, 3])
+            
+            return tf.cast(image_padded, tf.float32), {}
 
         image_paths = []
         for ext in ['*.jpg', '*.jpeg', '*.png']:
