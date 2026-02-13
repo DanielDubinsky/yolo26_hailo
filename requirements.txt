@@ -5,6 +5,6 @@ opencv-python
 # hailo-platform  # Required: Install via HailoRT
 # hailo-sdk-client # Required: Install via Hailo DFC
 fiftyone  # For downloading calibration data
-ultralytics==8.3.0 # For model export
+ultralytics==8.4.7 # For model export
 onnx # For subgraph extraction
 pydantic # For configuration management
