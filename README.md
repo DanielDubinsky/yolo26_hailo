@@ -2,6 +2,10 @@
 
 This repository provides a complete pipeline for deploying YOLO26n object detection models on the Raspberry Pi 5 AI Kit (Hailo-8L NPU). It includes scripts for model conversion (ONNX → HEF), C++ inference/evaluation code, and Python inference examples.
 
+<div align="center">
+  <img src="assets/yolo26_performance_tradeoff.png" width="600" />
+</div>
+
 ## Performance Summary (Raspberry Pi 5 + Hailo-8L)
 
 | Model | CPU mAP (FP32) | CPU FPS | Hailo mAP (INT8) | Hailo FPS | Speedup | Accuracy Retention |
@@ -12,6 +16,8 @@ This repository provides a complete pipeline for deploying YOLO26n object detect
 | **YOLO26l** | 0.541 | 0.74 | 0.473 | 17.9 | 24.2x | 87.4% |
 
 *\*Tested on COCO val2017 with letterbox preprocessing. FPS measured end-to-end (preprocessing + inference + postprocessing).*
+
+
 
 ## repository Structure
 

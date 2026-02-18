@@ -56,3 +56,4 @@ models/*.npy
 output/
 *.log
 experiments/
+!assets/**
